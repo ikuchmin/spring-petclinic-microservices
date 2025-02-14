@@ -1,0 +1,5 @@
+postgres:5432:petclinic:petclinic:petclinic
+postgres:5432:pc_vet:petclinic:petclinic
+postgres:5432:pc_customer:petclinic:petclinic
+postgres:5432:pc_visit:petclinic:petclinic
+

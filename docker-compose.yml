@@ -1,19 +1,4 @@
 services:
-  config-server:
-    image: springcommunity/spring-petclinic-config-server
-    container_name: config-server
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-    healthcheck:
-      test: ["CMD", "curl", "-I", "http://config-server:8888"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    ports:
-     - 8888:8888
-
   discovery-server:
     image: springcommunity/spring-petclinic-discovery-server
     container_name: discovery-server
@@ -30,7 +15,7 @@ services:
       config-server:
         condition: service_healthy
     ports:
-     - 8761:8761
+      - 8761:8761
 
   customers-service:
     image: springcommunity/spring-petclinic-customers-service
@@ -40,12 +25,14 @@ services:
         limits:
           memory: 512M
     depends_on:
-      config-server:
-        condition: service_healthy
       discovery-server:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     ports:
-    - 8081:8081
+      - 8081:8081
+    environment:
+      - SPRING_PROFILES_ACTIVE: postgres
 
   visits-service:
     image: springcommunity/spring-petclinic-visits-service
@@ -55,12 +42,14 @@ services:
         limits:
           memory: 512M
     depends_on:
-      config-server:
-        condition: service_healthy
       discovery-server:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     ports:
-     - 8082:8082
+      - 8082:8082
+    environment:
+      - SPRING_PROFILES_ACTIVE: postgres
 
   vets-service:
     image: springcommunity/spring-petclinic-vets-service
@@ -70,13 +59,14 @@ services:
         limits:
           memory: 512M
     depends_on:
-      config-server:
-        condition: service_healthy
       discovery-server:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     ports:
-     - 8083:8083
-
+      - 8083:8083
+    environment:
+      - SPRING_PROFILES_ACTIVE: postgres
 
   genai-service:
     image: springcommunity/spring-petclinic-genai-service
@@ -90,13 +80,12 @@ services:
         limits:
           memory: 512M
     depends_on:
-      config-server:
-        condition: service_healthy
       discovery-server:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     ports:
-     - 8084:8084
-
+      - 8084:8084
 
   api-gateway:
     image: springcommunity/spring-petclinic-api-gateway
@@ -106,59 +95,45 @@ services:
         limits:
           memory: 512M
     depends_on:
-      config-server:
-        condition: service_healthy
       discovery-server:
         condition: service_healthy
     ports:
      - 8080:8080
 
-  tracing-server:
-    image: openzipkin/zipkin
-    container_name: tracing-server
-    deploy:
-      resources:
-        limits:
-          memory: 512M
+  postgres:
+    image: postgres:17.2
+    restart: "no"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/initdb:/docker-entrypoint-initdb.d:ro
     environment:
-    # Waiting for https://github.com/openzipkin/zipkin/issues/3786
-    - JAVA_OPTS=-XX:UseSVE=0
-    ports:
-     - 9411:9411
+      POSTGRES_USER: petclinic
+      POSTGRES_PASSWORD: petclinic
+      POSTGRES_DB: petclinic
+    healthcheck:
+      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
 
-  admin-server:
-    image: springcommunity/spring-petclinic-admin-server
-    container_name: admin-server
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-    depends_on:
-      config-server:
-        condition: service_healthy
-      discovery-server:
-        condition: service_healthy
+  pgadmin:
+    image: dpage/pgadmin4:8.14.0
+    restart: "no"
     ports:
-     - 9090:9090
-
-  ## Grafana / Prometheus
-
-  grafana-server:
-    build: ./docker/grafana
-    container_name: grafana-server
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-    ports:
-    - 3030:3030
-
-  prometheus-server:
-    build: ./docker/prometheus
-    container_name: prometheus-server
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-    ports:
-    - 9091:9090
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./docker/pgadmin/servers.json:/pgadmin4/servers.json
+      - ./docker/pgadmin/pgpass:/pgadmin4/pgpass
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    entrypoint: /bin/sh -c "chmod 600 /pgadmin4/pgpass; /entrypoint.sh;"
+volumes:
+  postgres_data:
+  pgadmin_data:
