@@ -1,0 +1,72 @@
+eck-stack:
+  eck-elasticsearch:
+    http:
+      service:
+        spec:
+          type: LoadBalancer
+      tls:
+        selfSignedCertificate:
+          disabled: true
+    ingress:
+      enabled: true
+      hosts:
+        - host: es.127.0.0.1.sslip.io
+          path: /
+    nodeSets:
+      - name: default
+        count: 1
+        config:
+          node.store.allow_mmap: false
+  eck-kibana:
+    config:
+      server:
+        publicBaseUrl: "http://kibana.127.0.0.1.sslip.io"
+    http:
+      service:
+        spec:
+          type: LoadBalancer
+      tls:
+        selfSignedCertificate:
+          disabled: true
+    ingress:
+      enabled: true
+      hosts:
+        - host: kibana.127.0.0.1.sslip.io
+          path: /
+    nodeSets:
+      - name: default
+        count: 1
+        config:
+          node.store.allow_mmap: false
+fluent-bit:
+  config:
+    outputs: |
+      [OUTPUT]
+          Name es
+          Match kube.*
+          Host elasticsearch-es-http
+          HTTP_User ${ES_USER}
+          HTTP_Passwd ${ES_PASSWORD}
+          Retry_Limit False
+          Suppress_Type_Name On
+          Trace_Error On
+          Replace_Dots On
+      
+      [OUTPUT]
+          Name es
+          Match host.*
+          Host elasticsearch-es-http
+          HTTP_User ${ES_USER}
+          HTTP_Passwd ${ES_PASSWORD}
+          Retry_Limit False
+          Suppress_Type_Name On
+          Trace_Error On
+          Replace_Dots On
+  env:
+    - name: ES_USER
+      value: elastic
+    - name: ES_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: elasticsearch-es-elastic-user
+          key: elastic
