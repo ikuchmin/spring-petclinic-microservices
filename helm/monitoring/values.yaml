@@ -1,0 +1,21 @@
+kube-prometheus-stack:
+  grafana:
+    ingress:
+      enabled: true
+      hosts:
+        - grafana.127.0.0.1.sslip.io
+    adminPassword: paSSw0rd
+    sidecar:
+      dashboards:
+        enabled: true
+      datasources:
+        enabled: true
+  prometheus:
+    ingress:
+      enabled: true
+      hosts:
+        - prometheus.127.0.0.1.sslip.io
+    prometheusSpec:
+      serviceMonitorSelector: {}
+      serviceMonitorSelectorNilUsesHelmValues: false
+      serviceMonitorNamespaceSelector: {}
