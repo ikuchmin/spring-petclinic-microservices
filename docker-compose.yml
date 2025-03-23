@@ -1,104 +1,139 @@
 services:
   discovery-server:
-    image: springcommunity/spring-petclinic-discovery-server
-    container_name: discovery-server
+    image: spring-petclinic-discovery-server:3.4.1
+    restart: on-failure
     deploy:
       resources:
         limits:
-          memory: 512M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://discovery-server:8761"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-    depends_on:
-      config-server:
-        condition: service_healthy
+          memory: 1024M
     ports:
       - 8761:8761
+    environment:
+      SPRING_PROFILES_ACTIVE: compose
+      EUREKA_INSTANCE_HOSTNAME: discovery-server
+
+  config-server:
+    image: spring-petclinic-config-server:3.4.1
+    restart: on-failure
+    volumes:
+      - ./docker/config-server/keystore:/workspace/keystore
+    ports:
+      - 8888:8888
+      - 5005:5005
+    environment:
+      SPRING_PROFILES_ACTIVE: compose
+      EUREKA_SERVER_HOST: discovery-server:8761
+      ENCRYPT_KEYSTORE_LOCATION: /keystore/keystore.p12
+      ENCRYPT_KEYSTORE_ALIAS: configserver
+      ENCRYPT_KEYSTORE_PASSWORD: testtest
+    depends_on:
+      discovery-server:
+        condition: service_started
 
   customers-service:
-    image: springcommunity/spring-petclinic-customers-service
-    container_name: customers-service
+    image: spring-petclinic-customers-service:3.4.1
+    restart: on-failure
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
+    ports:
+      - 8081:8080
+    environment:
+      SPRING_PROFILES_ACTIVE: compose
+      EUREKA_SERVER_HOST: discovery-server:8761
+      POSTGRES_HOST: postgres:5432
+      POSTGRES_USERNAME: petclinic
+      POSTGRES_PASSWORD: petclinic
     depends_on:
       discovery-server:
-        condition: service_healthy
+        condition: service_started
+      config-server:
+        condition: service_started
       postgres:
         condition: service_healthy
-    ports:
-      - 8081:8081
-    environment:
-      - SPRING_PROFILES_ACTIVE: postgres
 
   visits-service:
-    image: springcommunity/spring-petclinic-visits-service
-    container_name: visits-service
+    image: spring-petclinic-visits-service:3.4.1
+    restart: on-failure
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
+    ports:
+      - 8082:8080
+    environment:
+      SPRING_PROFILES_ACTIVE: compose
+      EUREKA_SERVER_HOST: discovery-server:8761
+      POSTGRES_HOST: postgres:5432
+      POSTGRES_USERNAME: petclinic
+      POSTGRES_PASSWORD: petclinic
     depends_on:
       discovery-server:
-        condition: service_healthy
+        condition: service_started
+      config-server:
+        condition: service_started
       postgres:
         condition: service_healthy
-    ports:
-      - 8082:8082
-    environment:
-      - SPRING_PROFILES_ACTIVE: postgres
 
   vets-service:
-    image: springcommunity/spring-petclinic-vets-service
-    container_name: vets-service
+    image: spring-petclinic-vets-service:3.4.1
+    restart: on-failure
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
+    ports:
+      - 8083:8080
+    environment:
+      SPRING_PROFILES_ACTIVE: compose
+      EUREKA_SERVER_HOST: discovery-server:8761
+      POSTGRES_HOST: postgres:5432
+      POSTGRES_USERNAME: petclinic
+      POSTGRES_PASSWORD: petclinic
     depends_on:
       discovery-server:
-        condition: service_healthy
+        condition: service_started
+      config-server:
+        condition: service_started
       postgres:
         condition: service_healthy
-    ports:
-      - 8083:8083
-    environment:
-      - SPRING_PROFILES_ACTIVE: postgres
 
   genai-service:
-    image: springcommunity/spring-petclinic-genai-service
-    container_name: genai-service
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
-      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+    image: spring-petclinic-genai-service:3.4.1
+    restart: on-failure
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
+    ports:
+      - 8084:8080
+    environment:
+      SPRING_PROFILES_ACTIVE: compose
+      EUREKA_SERVER_HOST: discovery-server:8761
     depends_on:
       discovery-server:
-        condition: service_healthy
-      postgres:
-        condition: service_healthy
-    ports:
-      - 8084:8084
+        condition: service_started
+      config-server:
+        condition: service_started
 
   api-gateway:
-    image: springcommunity/spring-petclinic-api-gateway
-    container_name: api-gateway
+    image: spring-petclinic-api-gateway:3.4.1
+    restart: on-failure
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_PROFILES_ACTIVE: compose
+      EUREKA_SERVER_HOST: discovery-server:8761
     depends_on:
       discovery-server:
-        condition: service_healthy
-    ports:
-     - 8080:8080
+        condition: service_started
+      config-server:
+        condition: service_started
 
   postgres:
     image: postgres:17.2

@@ -3,47 +3,55 @@ spring:
     web-application-type: reactive
   application:
     name: genai-service
-  sql:
-    init:
-      schema-locations: classpath*:db/hsqldb/schema.sql
-      data-locations: classpath*:db/hsqldb/data.sql
+  profiles:
+    group:
+      dev:
+        - openai
+        - local
+      sdev:
+        - openai
+        - standalone
+        - local
+      compose:
+        - openai
+        - standalone
+        - cloudconfig
+  config:
+    import: "optional:configserver:"
+  cloud:
+    config:
+      enabled: false
+      fail-fast: true
+      discovery:
+        service-id: config-server
+        enabled: true
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: none
-  profiles:
-    active: production
   ai:
     chat:
       client:
         enabled: true
-    # These apply when using spring-ai-azure-openai-spring-boot-starter
     azure:
       openai:
-        api-key: ${AZURE_OPENAI_KEY}
-        endpoint: ${AZURE_OPENAI_ENDPOINT}
+        embedding:
+          enabled: false
         chat:
-          options:
-            temperature: 0.7
-            deployment-name: gpt-4o
-    # These apply when using spring-ai-openai-spring-boot-starter
+          enabled: false
     openai:
-      api-key: ${OPENAI_API_KEY:demo}
+      embedding:
+        enabled: false
       chat:
-        options:
-            temperature: 0.7
-            model: gpt-4o-mini
-
-server:
-  port: 8084
+        enabled: false
 
 eureka:
   instance:
     # enable to register multiple app instances with a random server port
     instance-id: ${spring.application.name}:${random.uuid}
   client:
-    serviceUrl:
-      defaultZone: http://discovery-server:8761/eureka/
+    enabled: false
+
 
 logging.level.org.springframework: INFO
 
@@ -60,29 +68,53 @@ logging:
 spring:
   config:
     activate:
-      on-profile: postgres
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost/petclinic
-    username: petclinic
-    password: petclinic
-  sql:
-    init:
-      schema-locations: classpath*:db/postgres/schema.sql
-      data-locations: classpath*:db/postgres/data.sql
-      mode: ALWAYS
+      on-profile: azureai
+  ai:
+    azure:
+      embedding:
+        enabled: true
+      openai:
+        chat:
+          enabled: true
+          options:
+            temperature: 0.7
+            deployment-name: gpt-4o
 
 ---
 spring:
   config:
     activate:
-      on-profile: mysql
-  datasource:
-    url: jdbc:mysql://localhost:3306/petclinic?useSSL=false
-    username: root
-    password: petclinic
-  sql:
-    init:
-      schema-locations: classpath*:db/mysql/schema.sql
-      data-locations: classpath*:db/mysql/data.sql
-      mode: ALWAYS
+      on-profile: openai
+  ai:
+    openai:
+      embedding:
+        enabled: true
+      chat:
+        enabled: true
+        options:
+          temperature: 0.7
+          model: gpt-4o-mini
+    azure:
+      openai:
+        # just to make possible having in classpath azure and openai starters
+        open-ai-api-key: noope
+
+---
+spring:
+  config:
+    activate:
+      on-profile: standalone
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://${EUREKA_SERVER_HOST:localhost:8761}/eureka/
+
+---
+spring:
+  config:
+    activate:
+      on-profile: cloudconfig
+  cloud:
+    config:
+      enabled: true

@@ -1,0 +1,20 @@
+eureka:
+  image:
+    repository: spring-petclinic-discovery-server
+    tag: 3.4.1
+  statefulset:
+    enabled: true
+  env:
+    - name: EUREKA_CLIENT_REGISTERWITHEUREKA
+      value: "true"
+    - name: EUREKA_CLIENT_FETCH_REGISTRY
+      value: "true"
+    - name: POD_NAME
+      valueFrom:
+        fieldRef:
+          fieldPath: metadata.name
+    - name: EUREKA_INSTANCE_HOSTNAME
+      value: $(POD_NAME).$(SUBDOMAIN)
+    - name: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
+      value: $(EUREKA_ADDRESS_LIST)
+  replicaCount: 3

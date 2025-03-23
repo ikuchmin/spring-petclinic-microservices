@@ -1,0 +1,23 @@
+echo-server:
+  enabled: true
+  ingress:
+    enabled: true
+    ingressClassName: "nginx"
+    annotations:
+      cert-manager.io/issuer: "letsencrypt-staging"
+    tls:
+      - hosts:
+          - echo.u-dya.ru
+        secretName: echo-local-tls
+    hosts:
+      - host: echo.localhost
+        paths:
+          - "/"
+cert-manager:
+  enabled: true
+  hostAliases:
+    - hostnames:
+      - echo.u-dya.ru
+      ip: 192.168.64.2
+  crds:
+    enabled: true
