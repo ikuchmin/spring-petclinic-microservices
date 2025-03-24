@@ -19,10 +19,9 @@ services:
       - ./docker/config-server/keystore:/workspace/keystore
     ports:
       - 8888:8888
-      - 5005:5005
     environment:
       SPRING_PROFILES_ACTIVE: compose
-      EUREKA_SERVER_HOST: discovery-server:8761
+      EUREKA_CLIENT_DEFAULTZONE: http://discovery-server:8761/eureka/
       ENCRYPT_KEYSTORE_LOCATION: /keystore/keystore.p12
       ENCRYPT_KEYSTORE_ALIAS: configserver
       ENCRYPT_KEYSTORE_PASSWORD: testtest
@@ -41,7 +40,7 @@ services:
       - 8081:8080
     environment:
       SPRING_PROFILES_ACTIVE: compose
-      EUREKA_SERVER_HOST: discovery-server:8761
+      EUREKA_CLIENT_DEFAULTZONE: http://discovery-server:8761/eureka/
       POSTGRES_HOST: postgres:5432
       POSTGRES_USERNAME: petclinic
       POSTGRES_PASSWORD: petclinic
@@ -64,7 +63,7 @@ services:
       - 8082:8080
     environment:
       SPRING_PROFILES_ACTIVE: compose
-      EUREKA_SERVER_HOST: discovery-server:8761
+      EUREKA_CLIENT_DEFAULTZONE: http://discovery-server:8761/eureka/
       POSTGRES_HOST: postgres:5432
       POSTGRES_USERNAME: petclinic
       POSTGRES_PASSWORD: petclinic
@@ -87,7 +86,7 @@ services:
       - 8083:8080
     environment:
       SPRING_PROFILES_ACTIVE: compose
-      EUREKA_SERVER_HOST: discovery-server:8761
+      EUREKA_CLIENT_DEFAULTZONE: http://discovery-server:8761/eureka/
       POSTGRES_HOST: postgres:5432
       POSTGRES_USERNAME: petclinic
       POSTGRES_PASSWORD: petclinic
@@ -110,7 +109,7 @@ services:
       - 8084:8080
     environment:
       SPRING_PROFILES_ACTIVE: compose
-      EUREKA_SERVER_HOST: discovery-server:8761
+      EUREKA_CLIENT_DEFAULTZONE: http://discovery-server:8761/eureka/
     depends_on:
       discovery-server:
         condition: service_started
@@ -128,7 +127,7 @@ services:
       - 8080:8080
     environment:
       SPRING_PROFILES_ACTIVE: compose
-      EUREKA_SERVER_HOST: discovery-server:8761
+      EUREKA_CLIENT_DEFAULTZONE: http://discovery-server:8761/eureka/
     depends_on:
       discovery-server:
         condition: service_started

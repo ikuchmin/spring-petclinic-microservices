@@ -6,10 +6,10 @@ spring:
       dev:
         - local
       sdev:
-        - standalone
+        - discovery
         - local
       compose:
-        - standalone
+        - discovery
         - cloudconfig
   config:
     import: "optional:configserver:"
@@ -78,12 +78,12 @@ logging.level.org.springframework.cloud.loadbalancer: DEBUG
 spring:
   config:
     activate:
-      on-profile: standalone
+      on-profile: discovery
 eureka:
   client:
     enabled: true
     service-url:
-      defaultZone: http://${EUREKA_SERVER_HOST:localhost:8761}/eureka/
+      defaultZone: ${EUREKA_CLIENT_DEFAULTZONE}
 
 ---
 spring:

@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+replicaCount: 2
 
 image:
   repository: spring-petclinic-config-server
@@ -13,9 +13,6 @@ image:
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
-
-profiles: ""
-env: {}
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -28,8 +25,7 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations:
-  {}
+podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
@@ -97,17 +93,19 @@ autoscaling:
     targetMemory: ""
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+volumes:
+  - name: keystore-volume
+    secret:
+      secretName: config-server-keystore
+      items:
+        - key: keystore.p12
+          path: keystore.p12
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+  - name: keystore-volume
+    mountPath: /workspace/keystore
+    readOnly: true
 
 nodeSelector: {}
 
@@ -115,10 +113,41 @@ tolerations: []
 
 affinity: {}
 
+profiles: "prod, discovery"
+
+eureka:
+  client:
+    defaultZone:
+      valueFrom:
+        configMapKeyRef:
+          name: discovery-server-address-list-configmap
+          key: eureka-address-list
+
+# It is possible to declare the keystore in another helm
+# for concrete deployment. Password can be declared using CI,
+# helm secrets or sops. Also, it can be crated by hand in concrete
+# namespace.
+keystore:
+  enabled: true
+  key: keystore.p12
+  filePath: keystore/keystore-prod.p12
+  password: testtest
+
+encrypt:
+  keystore:
+    enabled: true
+    alias: configserver
+    location: /keystore/keystore.p12
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: config-server-keystore-password
+          key: keystore-password
+
 metrics:
   enabled: false
   serviceMonitor:
-    path: 
+    path:
     jobLabel: ""
     interval: 15s
     scrapeTimeout: ""

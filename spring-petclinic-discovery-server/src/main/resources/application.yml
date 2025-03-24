@@ -8,9 +8,20 @@ spring:
         - local
       compose:
         - standalone
+      prod:
+        - cluster
 
 server:
   port: 8761
+
+management:
+  endpoint:
+    configprops:
+      show-values: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,configprops
 
 # Avoid some debugging logs at startup
 logging:
@@ -33,3 +44,14 @@ eureka:
     fetch-registry: false
     service-url:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+
+---
+spring:
+  config:
+    activate:
+      on-profile: cluster
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_DEFAULTZONE}

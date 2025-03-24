@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "eureka.fullname" . }}-address-list-configmap
+  labels:
+    app: {{ template "eureka.name" . }}
+    chart: {{ template "eureka.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- if .Values.labels }}
+      {{ toYaml .Values.labels | indent 4 }}
+    {{- end }}
+
+data:
+  {{- $subReplicaCount := sub (int .Values.eureka.replicaCount) 1 }}
+  eureka-address-list: {{ range $i, $e  := until (int $subReplicaCount) }}{{ (printf "http://%s-%d.%s-headless:%d/eureka/" (include "eureka.fullname" $) $i (include "eureka.fullname" $) (int $.Values.eureka.service.ingressPort)) }},{{ end }}{{ (printf "http://%s-%d.%s-headless:%d/eureka/" (include "eureka.fullname" $) $subReplicaCount (include "eureka.fullname" $) (int $.Values.eureka.service.ingressPort)) }}

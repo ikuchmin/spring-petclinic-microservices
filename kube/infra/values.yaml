@@ -11,8 +11,15 @@ postgresql:
   fullnameOverride: postgresql
 
   primary:
+    # DB Version: 17
+    # OS Type: linux
+    # DB Type: web
+    # Total Memory (RAM): 4 GB
+    # CPUs num: 2
+    # Connections num: 100
+    # Data Storage: ssd
     extendedConfiguration: |
-      max_connections = 40
+      max_connections = 100
       shared_buffers = 1GB
       effective_cache_size = 3GB
       maintenance_work_mem = 256MB
@@ -21,7 +28,7 @@ postgresql:
       default_statistics_target = 100
       random_page_cost = 1.1
       effective_io_concurrency = 200
-      work_mem = 13107kB
+      work_mem = 5242kB
       huge_pages = off
       min_wal_size = 1GB
       max_wal_size = 4GB
@@ -29,17 +36,17 @@ postgresql:
       - name: PC_VET_DB_PASSWORD
         valueFrom:
           secretKeyRef:
-            name: pc-vet-db-secret
+            name: infra-pc-vet-db-secret
             key: DB_PASSWORD
       - name: PC_CUSTOMER_DB_PASSWORD
         valueFrom:
           secretKeyRef:
-            name: pc-customer-db-secret
+            name: infra-pc-customer-db-secret
             key: DB_PASSWORD
       - name: PC_VISIT_DB_PASSWORD
         valueFrom:
           secretKeyRef:
-            name: pc-visit-db-secret
+            name: infra-pc-visit-db-secret
             key: DB_PASSWORD
 
     initdb:

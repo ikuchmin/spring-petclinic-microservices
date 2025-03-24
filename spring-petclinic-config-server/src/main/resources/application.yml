@@ -9,13 +9,14 @@ spring:
       sdev:
         - git
         - local
-        - standalone
+        - discovery
       compose:
         - git
         - icompose
-        - standalone
+        - discovery
       prod:
         - git
+        - discovery
         - iprod
 
   cloud:
@@ -40,14 +41,23 @@ eureka:
   client:
     enabled: false
 
+management:
+  endpoint:
+    configprops:
+      show-values: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,configprops
+
 ---
 spring:
   config:
     activate:
-      on-profile: standalone
+      on-profile: discovery
 
 eureka:
   client:
     enabled: true
     service-url:
-      defaultZone: http://${EUREKA_SERVER_HOST:localhost:8761}/eureka/
+      defaultZone: ${EUREKA_CLIENT_DEFAULTZONE}

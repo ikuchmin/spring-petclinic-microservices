@@ -14,7 +14,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-profiles: "configserver"
+profiles: "postgres, discovery, cloudconfig"
 env: {}
 
 serviceAccount:
@@ -44,7 +44,10 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 8083
+  port: 8080
+
+headlessService:
+  enabled: false
 
 ingress:
   enabled: false
@@ -53,7 +56,7 @@ ingress:
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: deployment.spring-petclinic.ru
+    - host: example.host
       paths:
         - path: /
           pathType: Prefix
@@ -75,12 +78,12 @@ resources: {}
   #   memory: 128Mi
 
 liveness:
-  delay: 60
+  delay: 15
   timeout: 10
   path: /actuator/health/liveness
 
 readiness:
-  delay: 60
+  delay: 15
   timeout: 10
   path: /actuator/health/readiness
 
@@ -110,13 +113,30 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+metrics:
+  enabled: false
+  serviceMonitor:
+    path:
+    jobLabel: ""
+    interval: 15s
+    scrapeTimeout: ""
+
+eureka:
+  client:
+    defaultZone:
+      valueFrom:
+        configMapKeyRef:
+          name: discovery-server-address-list-configmap
+          key: eureka-address-list
+
 postgres:
   host: postgresql
   db: pc_vet
   auth:
     username: pc_vet
-    secret: pc-vet-db-secret
-
-config:
-  server:
-    url: config-server:8888
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: infra-pc-vet-db-secret
+          key: DB_PASSWORD

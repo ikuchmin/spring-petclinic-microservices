@@ -39,6 +39,28 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: "{{ .Values.profiles }}"
+            - name: EUREKA_CLIENT_DEFAULTZONE
+              {{- if .Values.eureka.client.defaultZone.value }}
+              value: "{{ .Values.eureka.client.defaultZone.value }}"
+              {{- else if .Values.eureka.client.defaultZone.valueFrom }}
+              valueFrom:
+                {{- toYaml .Values.eureka.client.defaultZone.valueFrom | nindent 16 }}
+              {{- end }}
+            - name: EUREKA_INSTANCE_PREFERIPADDRESS
+              value: "true"
+            {{- if .Values.encrypt.keystore.enabled }}
+            - name: ENCRYPT_KEYSTORE_LOCATION
+              value: "{{ .Values.encrypt.keystore.location }}"
+            - name: ENCRYPT_KEYSTORE_ALIAS
+              value: "{{ .Values.encrypt.keystore.alias }}"
+            - name: ENCRYPT_KEYSTORE_PASSWORD
+              {{- if .Values.encrypt.keystore.password.value }}
+              value: "{{ .Values.encrypt.keystore.password.value }}"
+              {{- else if .Values.encrypt.keystore.password.valueFrom }}
+              valueFrom:
+                {{- toYaml .Values.encrypt.keystore.password.valueFrom | nindent 16 }}
+              {{- end }}
+            {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
