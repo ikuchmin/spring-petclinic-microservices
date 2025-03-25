@@ -1,11 +1,11 @@
 services:
   discovery-server:
-    image: springcommunity/spring-petclinic-discovery-server
+    image: spring-petclinic-discovery-server:3.4.1
     container_name: discovery-server
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
     healthcheck:
       test: ["CMD", "curl", "-f", "http://discovery-server:8761"]
       interval: 5s
@@ -18,12 +18,12 @@ services:
       - 8761:8761
 
   customers-service:
-    image: springcommunity/spring-petclinic-customers-service
+    image: spring-petclinic-customers-service:3.4.1
     container_name: customers-service
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -32,15 +32,15 @@ services:
     ports:
       - 8081:8081
     environment:
-      - SPRING_PROFILES_ACTIVE: postgres
+      SPRING_PROFILES_ACTIVE: postgres
 
   visits-service:
-    image: springcommunity/spring-petclinic-visits-service
+    image: spring-petclinic-visits-service:3.4.1
     container_name: visits-service
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -49,15 +49,15 @@ services:
     ports:
       - 8082:8082
     environment:
-      - SPRING_PROFILES_ACTIVE: postgres
+      SPRING_PROFILES_ACTIVE: postgres
 
   vets-service:
-    image: springcommunity/spring-petclinic-vets-service
+    image: spring-petclinic-vets-service:3.4.1
     container_name: vets-service
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -66,19 +66,19 @@ services:
     ports:
       - 8083:8083
     environment:
-      - SPRING_PROFILES_ACTIVE: postgres
+      SPRING_PROFILES_ACTIVE: postgres
 
   genai-service:
-    image: springcommunity/spring-petclinic-genai-service
+    image: spring-petclinic-genai-service:3.4.1
     container_name: genai-service
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY}
-      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      AZURE_OPENAI_KEY: ${AZURE_OPENAI_KEY}
+      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -88,12 +88,12 @@ services:
       - 8084:8084
 
   api-gateway:
-    image: springcommunity/spring-petclinic-api-gateway
+    image: spring-petclinic-api-gateway:3.4.1
     container_name: api-gateway
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1024M
     depends_on:
       discovery-server:
         condition: service_healthy
