@@ -63,9 +63,6 @@ services:
         condition: service_healthy
     ports:
       - 8083:8083
-    environment:
-      SPRING_PROFILES_ACTIVE: postgres, discovery
-      EUREKA_CLIENT_DEFAULTZONE: http://discovery-server:8761/eureka/
 
   genai-service:
     image: spring-petclinic-genai-service:3.4.1
