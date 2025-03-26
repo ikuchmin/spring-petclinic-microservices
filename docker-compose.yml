@@ -1,7 +1,6 @@
 services:
   discovery-server:
     image: spring-petclinic-discovery-server:3.4.1
-    container_name: discovery-server
     deploy:
       resources:
         limits:
@@ -16,10 +15,20 @@ services:
         condition: service_healthy
     ports:
       - 8761:8761
+  config-server:
+    image: spring-petclinic-config-server:3.4.4
+    ports:
+      - "8888:8888"
+    environment:
+      GIT_SEARCH_PATHS: /compose
+      EUREKA_CLIENT_DEFAULTZONE: http://discovery-server:8761/eureka/
+      ENCRYPT_KEYSTORE_LOCATION: /keystore/keystore.p12
+      ENCRYPT_KEYSTORE_ALIAS: configserver
+      ENCRYPT_KEYSTORE_PASSWORD: testtest
+
 
   customers-service:
     image: spring-petclinic-customers-service:3.4.1
-    container_name: customers-service
     deploy:
       resources:
         limits:
@@ -36,7 +45,6 @@ services:
 
   visits-service:
     image: spring-petclinic-visits-service:3.4.1
-    container_name: visits-service
     deploy:
       resources:
         limits:
@@ -53,24 +61,25 @@ services:
 
   vets-service:
     image: spring-petclinic-vets-service:3.4.1
-    container_name: vets-service
     deploy:
       resources:
         limits:
           memory: 1024M
     depends_on:
       discovery-server:
-        condition: service_healthy
+        condition: service_started
+      config-server:
+        condition: service_started
       postgres:
         condition: service_healthy
     ports:
       - 8083:8083
     environment:
-      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_PROFILES_ACTIVE: postgres, discovery
+      EUREKA_CLIENT_DEFAULTZONE: http://discovery-server:8761/eureka/
 
   genai-service:
     image: spring-petclinic-genai-service:3.4.1
-    container_name: genai-service
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       AZURE_OPENAI_KEY: ${AZURE_OPENAI_KEY}
@@ -89,7 +98,6 @@ services:
 
   api-gateway:
     image: spring-petclinic-api-gateway:3.4.1
-    container_name: api-gateway
     deploy:
       resources:
         limits:

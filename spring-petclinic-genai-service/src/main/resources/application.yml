@@ -55,34 +55,3 @@ logging:
           chat:
             client:
               advisor: DEBUG
-
----
-spring:
-  config:
-    activate:
-      on-profile: postgres
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost/petclinic
-    username: petclinic
-    password: petclinic
-  sql:
-    init:
-      schema-locations: classpath*:db/postgres/schema.sql
-      data-locations: classpath*:db/postgres/data.sql
-      mode: ALWAYS
-
----
-spring:
-  config:
-    activate:
-      on-profile: mysql
-  datasource:
-    url: jdbc:mysql://localhost:3306/petclinic?useSSL=false
-    username: root
-    password: petclinic
-  sql:
-    init:
-      schema-locations: classpath*:db/mysql/schema.sql
-      data-locations: classpath*:db/mysql/data.sql
-      mode: ALWAYS
