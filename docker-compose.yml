@@ -57,8 +57,6 @@ services:
     depends_on:
       discovery-server:
         condition: service_started
-      config-server:
-        condition: service_started
       postgres:
         condition: service_healthy
     ports:
