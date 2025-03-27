@@ -25,4 +25,12 @@
       </persistence-unit>
     </persistence-units>
   </component>
+  <component name="MarkedApplicationProperties">
+    <option name="files">
+      <list>
+        <option value="file://$PROJECT_DIR$/docker/config-server" />
+        <option value="file://$PROJECT_DIR$/../spring-petclinic-microservices-config" />
+      </list>
+    </option>
+  </component>
 </project>

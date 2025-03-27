@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    group:
+      dev-local:
+        - git
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${GIT_URI:https://gitflic.ru/project/ikuchmin/spring-petclinic-microservices-config.git}
+          default-label: ${GIT_DEFAULT_LABEL:master}
+          search-paths: ${GIT_SEARCH_PATHS}
+server:
+  port: 8888
+
+
+eureka:
+  instance:
+    # enable to register multiple app instances with a random server port
+    instance-id: ${spring.application.name}:${random.uuid}
+  client:
+    enabled: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: discovery
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}

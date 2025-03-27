@@ -5,13 +5,24 @@ services:
       resources:
         limits:
           memory: 1024M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://discovery-server:8761"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
     ports:
       - 8761:8761
+  config-server:
+    image: spring-petclinic-config-server:3.4.4
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./docker/config-server/keystore:/workspace/keystore
+    environment:
+      SPRING_PROFILES_ACTIVE: git, discovery
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      GIT_SEARCH_PATHS: /compose
+      ENCRYPT_KEYSTORE_LOCATION: /keystore/keystore.p12
+      ENCRYPT_KEYSTORE_ALIAS: compose
+      ENCRYPT_KEYSTORE_PASSWORD: w6egf6QA4hhjs7DHV_Py
+    depends_on:
+      discovery-server:
+        condition: service_started
 
   customers-service:
     image: spring-petclinic-customers-service:3.4.1
@@ -54,10 +65,18 @@ services:
     depends_on:
       discovery-server:
         condition: service_started
+      config-server:
+        condition: service_started
       postgres:
         condition: service_healthy
     ports:
-      - 8083:8083
+      - 8083:8080
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres, discovery, cloudconfig
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+      POSTGRES_HOST: postgres:5432
+      POSTGRES_USERNAME: petclinic
+      POSTGRES_PASSWORD: petclinic
 
   genai-service:
     image: spring-petclinic-genai-service:3.4.1

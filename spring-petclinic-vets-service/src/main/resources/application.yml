@@ -1,35 +1,38 @@
-vets:
-  cache:
-    ttl: 60
-    heap-size: 100
-
----
 spring:
   application:
     name: vets-service
-  sql:
-    init:
-      schema-locations: classpath*:db/hsqldb/schema.sql
-      data-locations: classpath*:db/hsqldb/data.sql
+  profiles:
+    group:
+      dev-local:
+        - postgres
+        - local
   jpa:
     open-in-view: false
     hibernate:
       ddl-auto: none
   cache:
     cache-names: vets
-  profiles:
-    active: production
+  cloud:
+    config:
+      enabled: false
+      fail-fast: true
+      discovery:
+        service-id: config-server
+        enabled: true
+  config:
+    import: "optional:configserver:"
 
-server:
-  port: 8083
+vets:
+  cache:
+    ttl: 60
+    heap-size: 100
 
 eureka:
   instance:
     # enable to register multiple app instances with a random server port
     instance-id: ${spring.application.name}:${random.uuid}
   client:
-    serviceUrl:
-      defaultZone: http://discovery-server:8761/eureka/
+    enabled: false
 
 logging.level.org.springframework: INFO
 
@@ -40,9 +43,9 @@ spring:
       on-profile: postgres
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost/pc_vet
-    username: petclinic
-    password: petclinic
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}/${POSTGRES_DB_NAME:pc_vet}
+    username: ${POSTGRES_USERNAME:petclinic}
+    password: ${POSTGRES_PASSWORD:petclinic}
   sql:
     init:
       schema-locations: classpath*:db/postgres/schema.sql
@@ -55,11 +58,42 @@ spring:
     activate:
       on-profile: mysql
   datasource:
-    url: jdbc:mysql://localhost:3306/petclinic?useSSL=false
-    username: root
-    password: petclinic
+    url: jdbc:mysql://${MYSQL_HOST:localhost:3306}/${MYSQL_DB_NAME:petclinic}?useSSL=false
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:petclinic}
   sql:
     init:
       schema-locations: classpath*:db/mysql/schema.sql
       data-locations: classpath*:db/mysql/data.sql
       mode: ALWAYS
+
+---
+spring:
+  config:
+    activate:
+      on-profile: hsql
+  sql:
+    init:
+      schema-locations: classpath*:db/hsqldb/schema.sql
+      data-locations: classpath*:db/hsqldb/data.sql
+
+---
+spring:
+  config:
+    activate:
+      on-profile: discovery
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: cloudconfig
+  cloud:
+    config:
+      enabled: true
+
