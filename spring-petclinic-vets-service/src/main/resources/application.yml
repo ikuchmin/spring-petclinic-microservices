@@ -1,9 +1,3 @@
-vets:
-  cache:
-    ttl: 60
-    heap-size: 100
-
----
 spring:
   application:
     name: vets-service
@@ -19,6 +13,11 @@ spring:
     cache-names: vets
   profiles:
     active: production
+
+vets:
+  cache:
+    ttl: 60
+    heap-size: 100
 
 server:
   port: 8083
