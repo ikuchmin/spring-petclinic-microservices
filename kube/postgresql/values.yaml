@@ -1,0 +1,59 @@
+postgresql:
+  enabled: true
+  fullnameOverride: postgresql
+  auth:
+    enablePostgresUser: false
+  primary:
+    extendedConfiguration: |
+      max_connections = 100
+      shared_buffers = 1GB
+      effective_cache_size = 3GB
+      maintenance_work_mem = 256MB
+      checkpoint_completion_target = 0.9
+      wal_buffers = 16MB
+      default_statistics_target = 100
+      random_page_cost = 1.1
+      effective_io_concurrency = 200
+      work_mem = 5242kB
+      huge_pages = off
+      min_wal_size = 1GB
+      max_wal_size = 4GB
+    extraEnvVars:
+      - name: PC_CUSTOMER_DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: postgresql-pc-customer-db-password
+            key: db-password
+      - name: PC_VET_DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: postgresql-pc-vet-db-password
+            key: db-password
+      - name: PC_VISIT_DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: postgresql-pc-visit-db-password
+            key: db-password
+    initdb:
+      scripts:
+        00_create_users.sh: |
+          #!/bin/sh
+          echo "Running pre-initialization tasks..."
+          
+          export PGPASSWORD=$POSTGRESQL_INITSCRIPTS_PASSWORD
+          
+          psql -c "CREATE USER pc_customer PASSWORD '${PC_CUSTOMER_DB_PASSWORD}'"
+          psql -c "CREATE USER pc_vet PASSWORD '${PC_VET_DB_PASSWORD}'"
+          psql -c "CREATE USER pc_visit PASSWORD '${PC_VISIT_DB_PASSWORD}'"
+        01_create_databases.sql: |
+          CREATE DATABASE pc_customer OWNER pc_customer;
+          CREATE DATABASE pc_vet OWNER pc_vet;
+          CREATE DATABASE pc_visit OWNER pc_visit;
+
+dbs:
+  pc_vet:
+    password: NJo9D9d9Q2N17Qe
+  pc_visit:
+    password: PYd9nNq60Jur0s3
+  pc_customer:
+    password: YZz6UfoE3q1eJv6

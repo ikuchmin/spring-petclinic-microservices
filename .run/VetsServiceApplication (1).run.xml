@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="VetsServiceApplication (1)" type="AmplicodeSpringBootApplication">
+    <option name="MAIN_CLASS_NAME" value="org.springframework.samples.petclinic.vets.VetsServiceApplication" />
+    <module name="spring-petclinic-vets-service" />
+    <option name="profiles">
+      <list>
+        <option value="dev-local" />
+      </list>
+    </option>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

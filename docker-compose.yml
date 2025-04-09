@@ -5,14 +5,28 @@ services:
       resources:
         limits:
           memory: 1024M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://discovery-server:8761"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
     ports:
       - 8761:8761
-
+  config-server:
+    image: spring-petclinic-config-server:3.4.1
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./docker/config-server/keystore:/workspace/keystore
+    environment:
+      SPRING_PROFILES_ACTIVE: discovery
+      GIT_SEARCH_PATHS: /compose
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+      ENCRYPT_KEYSTORE_LOCATION: /keystore/keystore.p12
+      ENCRYPT_KEYSTORE_ALIAS: compose
+      ENCRYPT_KEYSTORE_PASSWORD: w6egf6QA4hhjs7DHV_Py
+    labels:
+      amplicode.image: springboot
   customers-service:
     image: spring-petclinic-customers-service:3.4.1
     deploy:
@@ -54,17 +68,19 @@ services:
     depends_on:
       discovery-server:
         condition: service_started
+      config-server:
+        condition: service_started
       postgres:
         condition: service_healthy
     ports:
-      - 8083:8083
+      - 8083:8080
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres, discovery, cache, cloudconfig
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka
+      POSTGRES_HOST: postgres:5432
 
   genai-service:
     image: spring-petclinic-genai-service:3.4.1
-    environment:
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      AZURE_OPENAI_KEY: ${AZURE_OPENAI_KEY}
-      AZURE_OPENAI_ENDPOINT: ${AZURE_OPENAI_ENDPOINT}
     deploy:
       resources:
         limits:
