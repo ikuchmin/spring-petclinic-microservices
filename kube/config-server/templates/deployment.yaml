@@ -51,7 +51,7 @@ spec:
             - name: GIT_SEARCH_PATHS
               value: "{{ .Values.git.search.paths }}"
             - name: ENCRYPT_KEYSTORE_LOCATION
-              value: "/keystore/keystore"
+              value: "file:/application/keystore/keystore"
             - name: ENCRYPT_KEYSTORE_ALIAS
               value: "{{ .Values.encrypt.keystore.alias }}"
             - name: ENCRYPT_KEYSTORE_PASSWORD
@@ -83,7 +83,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: keystore-volume
-              mountPath: /workspace/keystore
+              mountPath: /application/keystore
               readOnly: true
           {{- with .Values.volumeMounts }}
             {{- toYaml . | nindent 12 }}

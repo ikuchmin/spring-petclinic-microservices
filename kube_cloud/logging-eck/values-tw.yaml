@@ -1,0 +1,4 @@
+eck-operator:
+  image:
+    repository: registry.gitflic.ru/project/ikuchmin/spring-petclinic-microservices-infra/eck-operator
+    tag: 2.16.1

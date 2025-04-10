@@ -1,0 +1,3 @@
+image:
+  repository: registry.gitflic.ru/project/ikuchmin/spring-petclinic-microservices/spring-petclinic-vets-service
+  tag: "3.4.1-amd64"

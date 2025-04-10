@@ -1,0 +1,18 @@
+   eck-stack:
+     eck-elasticsearch:
+       image: registry.gitflic.ru/project/ikuchmin/spring-petclinic-microservices-infra/elasticsearch:8.17.0
+     eck-kibana:
+       image: registry.gitflic.ru/project/ikuchmin/spring-petclinic-microservices-infra/kibana:8.17.0
+       config:
+         server:
+           publicBaseUrl: "http://kibana.demo5.spring-petclinic.ru"
+       ingress:
+         annotations:
+           cert-manager.io/cluster-issuer: "cert-manager-le-prod"
+         tls:
+           enabled: true
+           secretName: logging-kibana-tls
+         hosts:
+           - host: kibana.demo5.spring-petclinic.ru
+             path: /
+

@@ -25,6 +25,7 @@ services:
       ENCRYPT_KEYSTORE_LOCATION: /keystore/keystore.p12
       ENCRYPT_KEYSTORE_ALIAS: compose
       ENCRYPT_KEYSTORE_PASSWORD: w6egf6QA4hhjs7DHV_Py
+      JAVA_TOOL_OPTIONS:
     labels:
       amplicode.image: springboot
   customers-service:

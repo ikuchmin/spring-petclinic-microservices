@@ -1,0 +1,16 @@
+image:
+  repository: registry.gitflic.ru/project/ikuchmin/spring-petclinic-microservices/spring-petclinic-api-gateway
+  tag: 3.4.1-amd64
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: "cert-manager-le-prod"
+  hosts:
+    - host: demo5.spring-petclinic.ru
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: petclinic-api-gateway
+      hosts:
+        - demo5.spring-petclinic.ru
