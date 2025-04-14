@@ -1,6 +1,15 @@
 spring:
   application:
     name: config-server
+  profiles:
+    active: git
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${GIT_URI:https://gitflic.ru/project/ikuchmin/spring-petclinic-microservices-config.git}
+          default-label: ${GIT_DEFAULT_LABEL:demo6}
+          search-paths: ${GIT_SEARCH_PATHS:/production}
 
 server:
   port: 8888
@@ -14,6 +23,15 @@ eureka:
     serviceUrl:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+logging:
+  structured:
+    format:
+      console:
 ---
 
 spring:

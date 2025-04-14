@@ -1,0 +1,7 @@
+spring:
+  ai:
+    openai:
+      api-key: dev-key
+
+server:
+  port: 8084

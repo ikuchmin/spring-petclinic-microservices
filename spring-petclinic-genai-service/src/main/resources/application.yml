@@ -3,16 +3,20 @@ spring:
     web-application-type: reactive
   application:
     name: genai-service
-  sql:
-    init:
-      schema-locations: classpath*:db/hsqldb/schema.sql
-      data-locations: classpath*:db/hsqldb/data.sql
-  jpa:
-    open-in-view: false
-    hibernate:
-      ddl-auto: none
   profiles:
-    active: production
+    group:
+      dev-local:
+        - postgres
+        - local
+  config:
+    import: "optional:configserver:"
+  cloud:
+    config:
+      enabled: false
+      fail-fast: true
+      discovery:
+        enabled: true
+        service-id: config-server
   ai:
     chat:
       client:
@@ -28,14 +32,10 @@ spring:
             deployment-name: gpt-4o
     # These apply when using spring-ai-openai-spring-boot-starter
     openai:
-      api-key: ${OPENAI_API_KEY:demo}
       chat:
         options:
             temperature: 0.7
             model: gpt-4o-mini
-
-server:
-  port: 8084
 
 eureka:
   instance:
@@ -55,3 +55,23 @@ logging:
           chat:
             client:
               advisor: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: discovery
+
+eureka:
+  client:
+    enabled: true
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: cloudconfig
+  cloud:
+    config:
+      enabled: true
