@@ -1,0 +1,11 @@
+kube-prometheus-stack:
+  grafana:
+    ingress:
+      annotations:
+        cert-manager.io/cluster-issuer: "cert-manager-le-prod"
+      tls:
+        - hosts:
+            - grafana.demo5.spring-petclinic.ru
+          secretName: logging-grafana-tls
+      hosts:
+        - grafana.demo5.spring-petclinic.ru

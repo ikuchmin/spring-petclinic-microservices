@@ -21,3 +21,5 @@ target/
 generated/
 
 **/.DS_Store
+
+kube_cloud/csi-driver/values-secret.yaml
