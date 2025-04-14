@@ -5,11 +5,6 @@ services:
       resources:
         limits:
           memory: 1024M
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://discovery-server:8761"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
     ports:
       - 8761:8761
 
