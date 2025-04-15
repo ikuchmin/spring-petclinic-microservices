@@ -114,7 +114,7 @@ tolerations: []
 affinity: {}
 
 metrics:
-  enabled: false
+  enabled: true
   serviceMonitor:
     path: /actuator/prometheus
     jobLabel: ""

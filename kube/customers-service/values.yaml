@@ -5,7 +5,7 @@
 replicaCount: 2
 
 image:
-  repository: spring-petclinic-vets-service
+  repository: spring-petclinic-customers-service
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "3.4.1"
@@ -14,7 +14,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-profiles: "postgres, cloudconfig, discovery, cache"
+profiles: "postgres, cloudconfig, discovery"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -131,9 +131,9 @@ eureka:
 
 postgres:
   host: postgresql
-  username: pc_vet
+  username: pc_customer
   password:
     valueFrom:
       secretKeyRef:
-        name: postgresql-pc-vet-db-password
+        name: postgresql-pc-customer-db-password
         key: db-password

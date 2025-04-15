@@ -28,8 +28,8 @@
   <component name="MarkedApplicationProperties">
     <option name="files">
       <list>
-        <option value="file://$PROJECT_DIR$/../spring-petclinic-microservices-config" />
         <option value="file://$PROJECT_DIR$/tmp" />
+        <option value="file://$PROJECT_DIR$/../spring-petclinic-microservices-config/production" />
       </list>
     </option>
   </component>

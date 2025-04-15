@@ -5,7 +5,7 @@
 replicaCount: 2
 
 image:
-  repository: spring-petclinic-vets-service
+  repository: spring-petclinic-api-gateway
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "3.4.1"
@@ -14,7 +14,7 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-profiles: "postgres, cloudconfig, discovery, cache"
+profiles: "cloudconfig, discovery"
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -49,13 +49,13 @@ headlessService:
   enabled: false
 
 ingress:
-  enabled: false
-  className: ""
+  enabled: true
+  className: "nginx"
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
-    - host: example.host
+    - host: petclinic.localhost
       paths:
         - path: /
           pathType: Prefix
@@ -128,12 +128,3 @@ eureka:
         configMapKeyRef:
           name: discovery-server-eureka
           key: EUREKA_CLIENT_SERVICEURL_DEFAULTZONE
-
-postgres:
-  host: postgresql
-  username: pc_vet
-  password:
-    valueFrom:
-      secretKeyRef:
-        name: postgresql-pc-vet-db-password
-        key: db-password
