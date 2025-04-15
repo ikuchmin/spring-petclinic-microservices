@@ -8,7 +8,7 @@ letsencrypt:
   ingressClassName: nginx
   staging:
     server: https://acme-staging-v02.api.letsencrypt.org/directory
-    email: ikuchmin@demo5.spring-petclinic.ru
+    email: ikuchmin@demo6.spring-petclinic.ru
   prod:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: ikuchmin@demo5.spring-petclinic.ru
+    email: ikuchmin@demo6.spring-petclinic.ru
