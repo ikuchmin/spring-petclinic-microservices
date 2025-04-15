@@ -145,3 +145,9 @@ encrypt:
         secretKeyRef:
           name: config-server-keystore-password
           key: password
+
+logging:
+  structured:
+    enabled: false
+    format:
+      console: ecs

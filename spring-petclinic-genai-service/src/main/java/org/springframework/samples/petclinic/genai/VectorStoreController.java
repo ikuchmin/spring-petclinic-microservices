@@ -55,8 +55,8 @@ public class VectorStoreController {
 			// In order to save on AI credits, use a pre-embedded database that was saved
 			// to
 			// disk based on the current data in the h2 data.sql file
-			File file = resource.getFile();
-			((SimpleVectorStore) this.vectorStore).load(file);
+			//File file = resource.getFile();
+			((SimpleVectorStore) this.vectorStore).load(resource);
 			logger.info("vector store loaded from existing vectorstore.json file in the classpath");
 			return;
 		}

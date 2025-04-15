@@ -61,6 +61,10 @@ spec:
               valueFrom:
                 {{- toYaml .Values.encrypt.keystore.password.valueFrom | nindent 16}}
               {{ end }}
+            {{ if .Values.logging.structured.enabled }}
+            - name: LOGGING_STRUCTURED_FORMAT_CONSOLE
+              value: "{{ .Values.logging.structured.format.console }}"
+            {{ end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
